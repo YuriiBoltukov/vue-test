@@ -1,10 +1,13 @@
 
 Description!11
 
-Deploy link: ____
+Deploy link: https://flight-price-vue.netlify.app
 
-There is a quick version, so it means that I didn't make it 
+There is a quick version, so it means that I didn't make it perfect.
 
+ТЗ
+
+![img.png](img.png)
 
 # flight-price
 
