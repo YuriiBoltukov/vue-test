@@ -218,6 +218,9 @@ function filterByDestinationOrAirline(
   justify-content: space-between;
   margin-bottom: 10px;
 }
+.form label {
+	margin: 4px;
+}
 .price {
   display: flex;
   justify-content: space-between;
@@ -233,5 +236,6 @@ function filterByDestinationOrAirline(
 }
 .select label {
 	width: 100%;
+	margin: 4px;
 }
 </style>
