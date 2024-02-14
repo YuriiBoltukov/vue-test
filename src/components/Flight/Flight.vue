@@ -45,6 +45,7 @@
         <input
           type="number"
           v-model="minPrice"
+          class="form-control"
           id="priceFrom"
           name="priceFrom"
           ref="minPriceRef"
@@ -56,6 +57,7 @@
         <label for="priceTo">To:</label>
         <input
           type="number"
+          class="form-control"
           v-model="maxPrice"
           id="priceTo"
           name="priceTo"
