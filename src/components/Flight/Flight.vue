@@ -207,6 +207,9 @@ function filterByParams(): void {
   filterFlightData();
 }
 
+/**
+ * Function for filter all fields
+ */
 function filterByPrice(flight: FlightDataInternal): boolean {
   if (minPrice && maxPrice) {
     return flight.price >= minPrice && flight.price <= maxPrice;
