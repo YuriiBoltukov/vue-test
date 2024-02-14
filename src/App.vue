@@ -1,7 +1,7 @@
 <template>
-  <div class="wrapper">
-    <header>
-      <div>
+  <div class="container-xl">
+    <header  class="text-center">
+      <div  class="text-center">
         <Title title="Flight Prices" />
       </div>
     </header>
@@ -38,28 +38,3 @@ const loadData = async (): Promise<void> => {
 loadData();
 </script>
 
-<style scoped>
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-header {
-  line-height: 1.5;
-}
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
-</style>

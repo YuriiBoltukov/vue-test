@@ -12,6 +12,7 @@
         aria-label="default input example"
       />
     </label>
+	  <div class="select">
     <label for="filterByDestination"
       >Filter by destination
       <select
@@ -38,9 +39,10 @@
         <option :value="airline" v-for="airline in airlines" :key="airline">{{ airline }}</option>
       </select>
     </label>
+    </div>
     <div class="price">
 	    <span>Filter by price:</span>
-      <div>
+      <div class="price-wrapper">
         <label for="priceFrom">From:</label>
         <input
           type="number"
@@ -220,5 +222,16 @@ function filterByDestinationOrAirline(
   display: flex;
   justify-content: space-between;
   flex-direction: column;
+}
+.price-wrapper {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.select {
+	display: flex;
+}
+.select label {
+	width: 100%;
 }
 </style>
