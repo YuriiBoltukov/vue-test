@@ -1,58 +1,71 @@
-/**
-* Component for searching and filtering flight data.
-* @component
-*/
 <template>
-  <label for="search">Search</label>
-  <input
-    id="search"
-    v-model="searchedTerm"
-    @input="(event) => searchTerm(event.target.value)"
-    placeholder="Поиск"
-  />
+  <form class="form">
+    <label for="search"
+      >Search
+      <input
+        class="form-control"
+        id="search"
+        v-model="searchedTerm"
+        @input="(event) => searchTerm(event.target.value)"
+        type="text"
+        placeholder="Search"
+        aria-label="default input example"
+      />
+    </label>
+    <label for="filterByDestination"
+      >Filter by destination
+      <select
+        class="form-select"
+        name="Destination"
+        @change="(event) => filterByDestinationOrAirline(event.target.value, Title.destination)"
+        id="filterByDestination"
+        aria-label="Filter by destination"
+      >
+        <option :value="EMPTY_VALUE" selected>Select destination</option>
+        <option :value="data" v-for="(data, i) in destinations" :key="i">{{ data }}</option>
+      </select>
+    </label>
+    <label for="filterByAirlines"
+      >Filter by airlines
+      <select
+        class="form-select"
+        id="filterByAirlines"
+        name="Airline"
+        @change="(event) => filterByDestinationOrAirline(event.target.value, Title.airline)"
+        aria-label="Filter by airlines"
+      >
+        <option :value="EMPTY_VALUE">Select airline</option>
+        <option :value="airline" v-for="airline in airlines" :key="airline">{{ airline }}</option>
+      </select>
+    </label>
+    <div class="price">
+      <p>Filter by price</p>
+      <div>
+        <label for="priceFrom">From:</label>
+        <input
+          type="number"
+          v-model="minPrice"
+          id="priceFrom"
+          name="priceFrom"
+          ref="minPriceRef"
+          min="0"
+          placeholder="Minimum price"
+          @input="filterByParams"
+        />
 
-  <label for="filterByDestination">Filter by destination</label>
-  <select
-    id="filterByDestination"
-    name="Destination"
-    @change="(event) => filterByDestinationOrAirline(event.target.value, Title.destination)"
-  >
-    <option :value="EMPTY_VALUE">Select destination</option>
-    <option :value="data" v-for="(data, i) in destinations" :key="i">{{ data }}</option>
-  </select>
-
-  <label for="filterByAirlines">Filter by airlines</label>
-  <select
-    id="filterByAirlines"
-    name="Airline"
-    @change="(event) => filterByDestinationOrAirline(event.target.value, Title.airline)"
-  >
-    <option :value="EMPTY_VALUE">Select airline</option>
-    <option :value="airline" v-for="airline in airlines" :key="airline">{{ airline }}</option>
-  </select>
-
-  <label for="priceFrom">From:</label>
-  <input
-    type="number"
-    v-model="minPrice"
-    id="priceFrom"
-    name="priceFrom"
-    ref="minPriceRef"
-    min="0"
-    placeholder="Minimum price"
-    @input="filterByParams"
-  />
-
-  <label for="priceTo">To:</label>
-  <input
-    type="number"
-    v-model="maxPrice"
-    id="priceTo"
-    name="priceTo"
-    min="0"
-    placeholder="Maximum price"
-    @input="filterByParams"
-  />
+        <label for="priceTo">To:</label>
+        <input
+          type="number"
+          v-model="maxPrice"
+          id="priceTo"
+          name="priceTo"
+          min="0"
+          placeholder="Maximum price"
+          @input="filterByParams"
+        />
+      </div>
+    </div>
+  </form>
   <Table :tableData="flightDataToDisplay" :tableHeaders="headers" />
 </template>
 
@@ -194,3 +207,15 @@ function filterByDestinationOrAirline(
   }
 }
 </script>
+<style>
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.price {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+}
+</style>
