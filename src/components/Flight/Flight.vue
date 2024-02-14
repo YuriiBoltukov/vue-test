@@ -39,7 +39,7 @@
       </select>
     </label>
     <div class="price">
-      <p>Filter by price</p>
+	    <span>Filter by price:</span>
       <div>
         <label for="priceFrom">From:</label>
         <input
@@ -214,6 +214,7 @@ function filterByDestinationOrAirline(
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  margin-bottom: 10px;
 }
 .price {
   display: flex;
