@@ -1,7 +1,7 @@
 <template>
   <div class="container-xl">
-    <header  class="text-center">
-      <div  class="text-center">
+    <header class="text-center">
+      <div class="text-center">
         <Title title="Flight Prices" />
       </div>
     </header>
@@ -37,4 +37,3 @@ const loadData = async (): Promise<void> => {
 
 loadData();
 </script>
-

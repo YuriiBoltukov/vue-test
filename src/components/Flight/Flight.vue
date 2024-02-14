@@ -1,47 +1,49 @@
 <template>
-  <form class="form">
+  <div class="form">
     <label for="search"
       >Search
       <input
         class="form-control"
         id="search"
         v-model="searchedTerm"
-        @input="(event) => searchTerm(event.target.value)"
+        @input="filterFlightData"
         type="text"
         placeholder="Search"
         aria-label="default input example"
       />
     </label>
-	  <div class="select">
-    <label for="filterByDestination"
-      >Filter by destination
-      <select
-        class="form-select"
-        name="Destination"
-        @change="(event) => filterByDestinationOrAirline(event.target.value, Title.destination)"
-        id="filterByDestination"
-        aria-label="Filter by destination"
-      >
-        <option :value="EMPTY_VALUE" selected>Select destination</option>
-        <option :value="data" v-for="(data, i) in destinations" :key="i">{{ data }}</option>
-      </select>
-    </label>
-    <label for="filterByAirlines"
-      >Filter by airlines
-      <select
-        class="form-select"
-        id="filterByAirlines"
-        name="Airline"
-        @change="(event) => filterByDestinationOrAirline(event.target.value, Title.airline)"
-        aria-label="Filter by airlines"
-      >
-        <option :value="EMPTY_VALUE">Select airline</option>
-        <option :value="airline" v-for="airline in airlines" :key="airline">{{ airline }}</option>
-      </select>
-    </label>
+    <div class="select">
+      <label for="filterByDestination"
+        >Filter by destination
+        <select
+          class="form-select"
+          v-model="destination"
+          name="Destination"
+          @change="filterFlightData"
+          id="filterByDestination"
+          aria-label="Filter by destination"
+        >
+          <option :value="EMPTY_VALUE" selected>Select destination</option>
+          <option :value="data" v-for="(data, i) in destinations" :key="i">{{ data }}</option>
+        </select>
+      </label>
+      <label for="filterByAirlines"
+        >Filter by airlines
+        <select
+          class="form-select"
+          id="filterByAirlines"
+          v-model="airline"
+          name="Airline"
+          @change="filterFlightData"
+          aria-label="Filter by airlines"
+        >
+          <option :value="EMPTY_VALUE">Select airline</option>
+          <option :value="airline" v-for="airline in airlines" :key="airline">{{ airline }}</option>
+        </select>
+      </label>
     </div>
     <div class="price">
-	    <span>Filter by price:</span>
+      <span>Filter by price:</span>
       <div class="price-wrapper">
         <label for="priceFrom">From:</label>
         <input
@@ -69,7 +71,7 @@
         />
       </div>
     </div>
-  </form>
+  </div>
   <Table :tableData="flightDataToDisplay" :tableHeaders="headers" />
 </template>
 
@@ -98,17 +100,23 @@ let flightDataToDisplay: Ref<UnwrapRef<FlightDataInternal[]>>;
 /** Array of destination names. */
 let destinations: string[];
 
-/** Searched term. */
-let searchedTerm: string;
-
 /** Array of airline names. */
 let airlines: string[];
+
+/** Searched term. */
+let searchedTerm: string;
 
 /** Minimum price filter value. */
 let minPrice: number | null;
 
 /** Maximum price filter value. */
 let maxPrice: number | null;
+
+/** Selected destination filter value. */
+let destination: string | null;
+
+/** Selected airline filter value. */
+let airline: string | null;
 
 /** Array of table headers. */
 let headers: Header[];
@@ -157,8 +165,22 @@ function resolveHeaderTitle(header: Title): string {
   }[header];
 }
 
+function filterFlightData() {
+  flightDataToDisplay.value = flightDataInternal.filter((flight: FlightDataInternal) => {
+    //debugger
+    return (
+      searchTerm(flight) &&
+      filterByPrice(flight) &&
+      filterByDestinationOrAirline(flight, Title.destination) &&
+      filterByDestinationOrAirline(flight, Title.airline)
+    );
+  });
+}
+
 /** Handle search term change. */
-function searchTerm(value: string | null): void {
+function searchTerm(flight: FlightDataInternal): boolean {
+  if (!searchedTerm) return true;
+
   const fieldsToCheck = [
     Title.origin,
     Title.destination,
@@ -167,13 +189,11 @@ function searchTerm(value: string | null): void {
     Title.flight_number
   ];
 
-  flightDataToDisplay.value = flightDataInternal.filter((flight: FlightDataInternal) => {
-    return Object.keys(flight)
-      .filter((key: Title) => fieldsToCheck.includes(key))
-      .some((key) => {
-        return String(flight[key]).toLowerCase().includes(value?.toLowerCase());
-      });
-  });
+  return Object.keys(flight)
+    .filter((key: Title) => fieldsToCheck.includes(key))
+    .some((key) => {
+      return String(flight[key]).toLowerCase().includes(searchedTerm?.toLowerCase());
+    });
 }
 
 /** Handle filtering by price range. */
@@ -184,30 +204,36 @@ function filterByParams(): void {
     else maxPrice = null;
   }
 
-  flightDataToDisplay.value = flightDataInternal.filter((flight: FlightDataInternal) => {
-    if (minPrice && maxPrice) {
-      return flight.price >= minPrice && flight.price <= maxPrice;
-    } else if (minPrice) {
-      return flight.price >= minPrice;
-    } else if (maxPrice) {
-      return flight.price <= maxPrice;
-    }
+  filterFlightData();
+}
 
-    return true;
-  });
+function filterByPrice(flight: FlightDataInternal): boolean {
+  if (minPrice && maxPrice) {
+    return flight.price >= minPrice && flight.price <= maxPrice;
+  } else if (minPrice) {
+    return flight.price >= minPrice;
+  } else if (maxPrice) {
+    return flight.price <= maxPrice;
+  }
+
+  return true;
 }
 
 /** Handle filtering by destination or airline. */
 function filterByDestinationOrAirline(
-  value: FlightDataInternal[Title.destination] | FlightDataInternal[Title.airline] | null,
+  flight: FlightDataInternal,
   key: Title.destination | Title.airline
-): void {
-  if (value && value !== EMPTY_VALUE) {
-    flightDataToDisplay.value = flightDataInternal.filter(
-      (flight: FlightDataInternal) => flight[key] === value
-    );
-  } else {
-    flightDataToDisplay.value = structuredClone(flightDataInternal);
+): boolean {
+  switch (key) {
+    case Title.destination:
+      if (!destination || destination === EMPTY_VALUE) return true;
+      return flight[Title.destination] === destination;
+    case Title.airline:
+      if (!airline || airline === EMPTY_VALUE) return true;
+      return flight[Title.airline] === airline;
+    default:
+      console.error("It's not implemented yet!");
+      return false;
   }
 }
 </script>
@@ -219,7 +245,7 @@ function filterByDestinationOrAirline(
   margin-bottom: 10px;
 }
 .form label {
-	margin: 4px;
+  margin: 4px;
 }
 .price {
   display: flex;
@@ -227,15 +253,15 @@ function filterByDestinationOrAirline(
   flex-direction: column;
 }
 .price-wrapper {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .select {
-	display: flex;
+  display: flex;
 }
 .select label {
-	width: 100%;
-	margin: 4px;
+  width: 100%;
+  margin: 4px;
 }
 </style>
